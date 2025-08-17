@@ -1,0 +1,201 @@
+import pandas as pd
+import numpy as np
+from shapely.geometry import LineString
+from geopy.distance import geodesic
+import os
+import math
+
+VESSEL_STATS_BY_TYPE = {
+1: {'Length': 168.056, 'Width': 25.435, 'Draft': 7.835},
+2: {'Length': 40.0, 'Width': 11.0, 'Draft': 3.0},
+4: {'Length': 295.0, 'Width': 45.0, 'Draft': 9.5},
+6: {'Length': 32.0, 'Width': 8.0, 'Draft': 2.0},
+7: {'Length': 33.0, 'Width': 7.0, 'Draft': 2.7},
+9: {'Length': 100.636, 'Width': 17.393, 'Draft': 5.223},
+10: {'Length': 83.089, 'Width': 15.153, 'Draft': 4.723},
+15: {'Length': 15.0, 'Width': 5.0, 'Draft': 0.0},
+16: {'Length': 80.0, 'Width': 18.0, 'Draft': 4.0},
+18: {'Length': 45.0, 'Width': 10.0, 'Draft': 0.0},
+19: {'Length': 80.0, 'Width': 20.0, 'Draft': 5.843},
+20: {'Length': 85.394, 'Width': 19.267, 'Draft': 3.951},
+22: {'Length': 128.0, 'Width': 17.0, 'Draft': 4.9},
+26: {'Length': 500.0, 'Width': 100.0, 'Draft': 1.0},
+27: {'Length': 31.0, 'Width': 13.0, 'Draft': 2.0},
+29: {'Length': 46.909, 'Width': 11.068, 'Draft': 2.932},
+30: {'Length': 36.87, 'Width': 10.443, 'Draft': 2.397},
+31: {'Length': 37.479, 'Width': 10.159, 'Draft': 3.179},
+32: {'Length': 57.681, 'Width': 13.239, 'Draft': 4.871},
+33: {'Length': 55.924, 'Width': 13.353, 'Draft': 2.831},
+34: {'Length': 20.223, 'Width': 5.812, 'Draft': 0.878},
+35: {'Length': 78.635, 'Width': 12.728, 'Draft': 3.704},
+36: {'Length': 41.218, 'Width': 8.481, 'Draft': 3.374},
+37: {'Length': 40.104, 'Width': 8.772, 'Draft': 2.466},
+38: {'Length': 63.006, 'Width': 14.154, 'Draft': 3.806},
+39: {'Length': 40.918, 'Width': 9.931, 'Draft': 2.189},
+40: {'Length': 49.517, 'Width': 11.79, 'Draft': 2.099},
+49: {'Length': 28.54, 'Width': 8.658, 'Draft': 1.692},
+50: {'Length': 16.938, 'Width': 5.52, 'Draft': 1.33},
+51: {'Length': 14.452, 'Width': 3.91, 'Draft': 0.824},
+52: {'Length': 61.712, 'Width': 13.013, 'Draft': 4.176},
+53: {'Length': 11.802, 'Width': 7.641, 'Draft': 1.059},
+54: {'Length': 35.024, 'Width': 9.632, 'Draft': 2.259},
+55: {'Length': 28.213, 'Width': 5.775, 'Draft': 1.26},
+56: {'Length': 23.0, 'Width': 8.0, 'Draft': 0.0},
+57: {'Length': 133.287, 'Width': 21.422, 'Draft': 4.961},
+58: {'Length': 142.371, 'Width': 15.543, 'Draft': 4.711},
+59: {'Length': 38.65, 'Width': 11.372, 'Draft': 3.802},
+60: {'Length': 125.502, 'Width': 20.493, 'Draft': 3.919},
+63: {'Length': 44.704, 'Width': 9.0, 'Draft': 0.849},
+65: {'Length': 49.084, 'Width': 13.135, 'Draft': 2.829},
+66: {'Length': 45.0, 'Width': 12.0, 'Draft': 1.2},
+67: {'Length': 116.708, 'Width': 18.123, 'Draft': 2.083},
+68: {'Length': 18.424, 'Width': 5.433, 'Draft': 1.892},
+69: {'Length': 210.057, 'Width': 32.495, 'Draft': 6.011},
+70: {'Length': 192.008, 'Width': 29.576, 'Draft': 8.754},
+71: {'Length': 249.29, 'Width': 34.723, 'Draft': 10.204},
+72: {'Length': 259.872, 'Width': 35.788, 'Draft': 10.531},
+73: {'Length': 284.026, 'Width': 37.534, 'Draft': 11.344},
+74: {'Length': 268.766, 'Width': 37.1, 'Draft': 10.954},
+75: {'Length': 180.802, 'Width': 26.808, 'Draft': 7.303},
+76: {'Length': 180.0, 'Width': 32.0, 'Draft': 10.45},
+77: {'Length': 96.646, 'Width': 17.198, 'Draft': 4.273},
+78: {'Length': 95.883, 'Width': 20.417, 'Draft': 3.143},
+79: {'Length': 193.531, 'Width': 27.722, 'Draft': 8.551},
+80: {'Length': 217.939, 'Width': 36.534, 'Draft': 10.065},
+81: {'Length': 224.22, 'Width': 36.51, 'Draft': 9.678},
+82: {'Length': 173.619, 'Width': 28.39, 'Draft': 9.032},
+83: {'Length': 191.438, 'Width': 31.117, 'Draft': 8.799},
+84: {'Length': 240.557, 'Width': 38.085, 'Draft': 9.46},
+85: {'Length': 190.716, 'Width': 30.235, 'Draft': 9.037},
+88: {'Length': 228.129, 'Width': 40.193, 'Draft': 13.168},
+89: {'Length': 189.681, 'Width': 31.289, 'Draft': 9.107},
+90: {'Length': 84.455, 'Width': 14.461, 'Draft': 3.279},
+91: {'Length': 175.622, 'Width': 32.021, 'Draft': 8.059},
+95: {'Length': 44.786, 'Width': 11.925, 'Draft': 2.949},
+96: {'Length': 45.935, 'Width': 12.584, 'Draft': 2.812},
+97: {'Length': 50.437, 'Width': 10.586, 'Draft': 1.155},
+98: {'Length': 15.0, 'Width': 0.0, 'Draft': 0.0},
+120: {'Length': 19.0, 'Width': 8.0, 'Draft': 0.0},
+200: {'Length': 77.0, 'Width': 13.0, 'Draft': 3.0},
+208: {'Length': 278.0, 'Width': 62.0, 'Draft': 12.4},
+255: {'Length': 8.0, 'Width': 3.0, 'Draft': 1.0},
+
+}
+
+
+from shapely import wkt  # to parse MULTILINESTRING
+
+def process_ais_file(input_csv_path, output_csv_path):
+    df = pd.read_csv(input_csv_path)
+    df = df.sort_values(by=['MMSI', 'TrackStartTime']).reset_index(drop=True)
+    vector_data = []
+
+    for idx, row in df.iterrows():
+        try:
+            vt = int(row['VesselType'])
+            if vt not in VESSEL_STATS_BY_TYPE:
+                continue  # skip unknown types
+
+            # Parse geometry into coordinates
+            multiline = wkt.loads(row['geometry'])
+
+            all_points = [pt for line in multiline.geoms for pt in line.coords]
+
+            if len(all_points) < 2:
+                continue
+
+            total_duration_min = row['DurationMinutes']
+            if total_duration_min == 0:
+                print(f"[SKIP] Row {idx} skipped — zero DurationMinutes (MMSI {row['MMSI']})")
+                continue
+
+            duration_per_segment_min = total_duration_min / (len(all_points) - 1)
+            time_diff_sec = duration_per_segment_min * 60.0
+            stats = VESSEL_STATS_BY_TYPE[vt]
+
+            for i in range(1, len(all_points)):
+                lon1, lat1 = all_points[i - 1]
+                lon2, lat2 = all_points[i]
+
+                distance = geodesic((lat1, lon1), (lat2, lon2)).meters
+                angle = calculate_bearing(lat1, lon1, lat2, lon2)
+                speed_knots = (distance * 1.94384) / time_diff_sec
+
+                # Compute segment times
+                segment_start = pd.to_datetime(row['TrackStartTime']) + pd.to_timedelta((i - 1) * duration_per_segment_min, unit='m')
+                segment_end = pd.to_datetime(row['TrackStartTime']) + pd.to_timedelta(i * duration_per_segment_min, unit='m')
+
+                vector_data.append({
+                    'MMSI': row['MMSI'],
+                    'TrackStartTime': row['TrackStartTime'],
+                    'TrackEndTime': row['TrackEndTime'],
+                    'Segment_StartTime': segment_start,
+                    'Segment_EndTime': segment_end,
+                    'VesselType': vt,
+                    'Global_Length': stats['Length'],
+                    'Global_Width': stats['Width'],
+                    'Global_Draft': stats['Draft'],
+                    'Distance_Meters': distance,
+                    'Speed_Knots': speed_knots,
+                    'Bearing_Degrees': angle,
+                    'Start_Lat': lat1,
+                    'Start_Lon': lon1,
+                    'End_Lat': lat2,
+                    'End_Lon': lon2
+                })
+
+        except Exception as e:
+            print(f"[WARNING] Skipping row {idx}: {e}")
+
+    output_df = pd.DataFrame(vector_data)
+    output_df.to_csv(output_csv_path, index=False)
+    print(f"[INFO] Saved {len(output_df)} vectors to: {output_csv_path}")
+
+
+
+
+def calculate_bearing(lat1, lon1, lat2, lon2):
+    """
+    Calculates the bearing (angle in degrees) from point A to point B.
+    """
+    dLon = math.radians(lon2 - lon1)
+    lat1 = math.radians(lat1)
+    lat2 = math.radians(lat2)
+
+    x = math.sin(dLon) * math.cos(lat2)
+    y = math.cos(lat1) * math.sin(lat2) - (
+        math.sin(lat1) * math.cos(lat2) * math.cos(dLon)
+    )
+
+    bearing = math.atan2(x, y)
+    return (math.degrees(bearing) + 360) % 360
+
+
+def process_all_batches(input_dir, output_dir):
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    for filename in os.listdir(input_dir):
+
+        if filename.endswith('.csv'):
+            input_path = os.path.join(input_dir, filename)
+            output_path = os.path.join(output_dir, f'vectors_{filename}')
+            output_filename = f'vectors_{filename}'
+
+            if os.path.exists(output_path):
+                print(f"[SKIP] {output_filename} already exists. Skipping.")
+                continue
+
+            try:
+                print(f"[INFO] Processing {filename} ...")
+                process_ais_file(input_path, output_path)
+            except Exception as e:
+                print(f"[ERROR] Failed to process {filename}: {e}")
+
+
+input_dir='/mnt/new_home/idan7/data_mining/ais_tracks_export/chunks/'
+output_dir='/mnt/new_home/idan7/data_mining/ais_tracks_export/vectors_for_bert_updated/'
+
+
+process_all_batches(input_dir, output_dir)
