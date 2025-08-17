@@ -41,9 +41,8 @@ By treating vessel trajectories as sequential data (similar to sentences in lang
 
 ## 📊 Results
 
-* The GPT-based model was able to **generate realistic continuation of vessel tracks**.
-* Prediction quality varied by vessel type (cargo, tanker, fishing).
-* Demonstrated that NLP-inspired models can successfully adapt to geospatial sequence prediction.
+* The GPT-based model was able to **generate approximate vessel tracks**.
+* Demonstrated that NLP-inspired models can adapt to geospatial sequence prediction.
 
 ---
 
