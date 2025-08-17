@@ -54,21 +54,6 @@ By treating vessel trajectories as sequential data (similar to sentences in lang
 * **Risk & safety analysis**: predicting potential vessel encounters.
 * **Environmental studies**: modeling ship emissions along synthetic trajectories.
 
----
-
-## 📂 Repository Structure
-
-```
-.
-├── data/                 # AIS samples (preprocessed)
-├── preprocessing/        # Scripts for data cleaning & formatting
-├── models/               # GPT training and fine-tuning code
-├── experiments/          # Evaluation scripts & results
-├── notebooks/            # Jupyter notebooks for exploration
-└── README.md             # Project description
-```
-
----
 
 ## 🚀 Getting Started
 
@@ -78,54 +63,6 @@ By treating vessel trajectories as sequential data (similar to sentences in lang
 * PyTorch
 * Hugging Face Transformers
 * Geopandas / Shapely (for AIS preprocessing)
-
-### Installation
-
-```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
-pip install -r requirements.txt
-```
-
-### Training
-
-```bash
-python train_gpt.py --data data/ais_sequences.txt --epochs 10
-```
-
-### Inference
-
-```bash
-python generate.py --input "LAT:25.8 LON:-82.7 SPD:8.1 BRG:356 ΔT:120"
-```
-
----
-
-## ✨ Example Output
-
-**Input (partial track):**
-
-```
-LAT:25.7919 LON:-82.7374 SPD:8.1 BRG:356 ΔT:0 |
-LAT:25.8160 LON:-82.7387 SPD:3.2 BRG:358 ΔT:938 |
-```
-
-**Generated continuation:**
-
-```
-LAT:25.8178 LON:-82.7387 SPD:14.9 BRG:358 ΔT:120 |
-LAT:25.8261 LON:-82.7391 SPD:3.1 BRG:358 ΔT:120 |
-...
-<|endofroute|>
-```
-
----
-
-## 📝 License
-
-This project is released under the **MIT License**.
-
----
 
 ## 🙌 Acknowledgements
 
