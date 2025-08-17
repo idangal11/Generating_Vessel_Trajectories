@@ -14,7 +14,7 @@ By treating vessel trajectories as sequential data (similar to sentences in lang
 
 * **Predict missing trajectory segments**.
 * **Generate complete vessel routes** given partial inputs.
-* **Model maritime movement patterns** for traffic simulation and risk assessment.
+* **Model maritime movement patterns** for traffic simulation.
 
 ---
 
