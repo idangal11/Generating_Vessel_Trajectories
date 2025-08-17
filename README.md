@@ -1,8 +1,3 @@
-מצוין 👍
-הכנתי לך טיוטה ל־**README.md** יפה, מסודר וברמה אקדמית/פרויקטית, שתוכל לשים בגיטהאב. אפשר לשנות ניסוחים לפי הסגנון שאתה אוהב:
-
----
-
 # Generating Vessel Trajectories Using GPT and AIS Data
 
 ## 📌 Overview
@@ -137,7 +132,3 @@ This project is released under the **MIT License**.
 * AIS data courtesy of [Marine Cadastre](https://marinecadastre.gov/).
 * GPT-2 architecture from [Hugging Face Transformers](https://huggingface.co/transformers/).
 * Research inspired by maritime data modeling and NLP adaptation.
-
----
-
-רוצה שאעשה לך גם **גרסה קצרה ופשוטה יותר** (ב־README של סטודנטים/תעשייה) או להשאיר את זה ברמה היותר מחקרית-רשמית?
